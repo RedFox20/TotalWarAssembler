@@ -7,11 +7,6 @@ namespace TotalWarAssembler
 {
     public class TreeSearchBox : TextBox
     {
-        //static TreeSearchBox()
-        //{
-        //    DefaultStyleKeyProperty.OverrideMetadata(typeof(TreeSearchBox), new FrameworkPropertyMetadata(typeof(TreeSearchBox)));
-        //}
-
         public TreeView Tree;
 
         public TreeSearchBox()

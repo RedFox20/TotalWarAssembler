@@ -24,17 +24,17 @@ namespace AssemblyKit
 
     public class FieldDescr
     {
-        public int Index { get; }
-        public string Uuid { get; }
-        public string Name { get; }
-        public FieldType Type  { get; }
-        public bool PrimaryKey { get; }
-        public bool Required   { get; }
-        public int  MaxLength  { get; }
-        public object DefaultValue     { get; }
-        public string FieldDescription { get; }
-        public bool EncylopediaExport  { get; }
-        public bool IsFileName         { get; }
+        public readonly int Index;
+        public readonly string Uuid;
+        public readonly string Name;
+        public readonly FieldType Type;
+        public readonly bool PrimaryKey;
+        public readonly bool Required;
+        public readonly int  MaxLength;
+        public readonly object DefaultValue;
+        public readonly string FieldDescription;
+        public readonly bool EncylopediaExport;
+        public readonly bool IsFileName;
 
         private static readonly Dictionary<string, string> EmptyDict = new Dictionary<string, string>();
 

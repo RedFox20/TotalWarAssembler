@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using AssemblyKit;
 
 namespace TotalWarAssembler
 {
@@ -16,32 +16,45 @@ namespace TotalWarAssembler
         //    DefaultStyleKeyProperty.OverrideMetadata(typeof(DataTableGrid), new FrameworkPropertyMetadata(typeof(DataTableGrid)));
         //}
 
+        private readonly DataTable TableRepresentation = new System.Data.DataTable();
+        public DataTable Table => TableRepresentation;
+
         public DataTableGrid()
         {
             CanUserSortColumns = true;
             CanUserAddRows = false;
+            CanUserResizeRows = false;
+            AutoGenerateColumns = false;
+            EnableColumnVirtualization = false;
+            EnableRowVirtualization = true;
         }
 
-        public void Clear()
+        public void LoadTable(AssemblyKit.DataTable table)
         {
             Columns.Clear();
-        }
+            TableRepresentation.Clear();
+            TableRepresentation.Columns.Clear();
 
-        public void LoadTable(DataTable table)
-        {
-            Clear();
-
-            Schema schema = table.Schema;
-            foreach (FieldDescr descr in schema.Fields)
+            AssemblyKit.Schema schema = table.Schema;
+            foreach (AssemblyKit.FieldDescr descr in schema.Fields)
             {
                 Columns.Add(CreateTextBoxColumn(descr.Name));
+                var dataColumn = new DataColumn(descr.Name);
+                TableRepresentation.Columns.Add(dataColumn);
             }
 
-            List<DataRow> rows = table.Rows;
-            foreach (DataRow row in rows)
+            foreach (AssemblyKit.DataRow row in table.Rows)
             {
-                Items.Add(row.Columns);
+                System.Data.DataRow dr = TableRepresentation.NewRow();
+                for (int i = 0; i < schema.Fields.Length; ++i)
+                {
+                    dr[i] = row.Columns[i];
+                }
+
+                TableRepresentation.Rows.Add(dr);
             }
+
+            DataContext = TableRepresentation.DefaultView;
         }
 
         private DataGridTemplateColumn CreateTextBoxColumn(string name)

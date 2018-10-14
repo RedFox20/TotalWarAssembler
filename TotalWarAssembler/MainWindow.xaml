@@ -44,7 +44,21 @@
                           SelectedItemChanged="ModTree_SelectedItemChanged"/>
             </DockPanel>
             <GridSplitter Grid.Column="1" Width="4" />
-            <local:DataTableGrid Grid.Column="2" x:Name="DataGrid" AutoGenerateColumns="false" />
+            <DockPanel Grid.Column="2" LastChildFill="True">
+                <DockPanel DockPanel.Dock="Top">
+                    <local:DataGridSearchBox Height="22" FontSize="14" x:Name="DataSearch" Text="Filter..."/>
+                </DockPanel>
+                <local:DataTableGrid x:Name="DataGrid"
+                                     RowHeaderWidth="50"
+                                     SelectionUnit="CellOrRowHeader"
+                                     SelectionMode="Extended"
+                                     VirtualizingStackPanel.IsVirtualizing="True"
+                                     VirtualizingStackPanel.VirtualizationMode="Recycling"
+                                     ScrollViewer.CanContentScroll="True"
+                                     ItemsSource="{Binding}"
+                                     Background="#FFAAAAAA"
+                                     />
+            </DockPanel>
         </Grid>
     </DockPanel>
 </Window>

@@ -58,6 +58,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="DataGridSearchBox.cs" />
     <Compile Include="DataTableGrid.cs" />
     <Compile Include="TreeSearchBox.cs" />
     <Page Include="MainWindow.xaml">

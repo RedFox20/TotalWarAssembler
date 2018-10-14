@@ -33,6 +33,7 @@ namespace TotalWarAssembler
 
             VanillaSearch.Tree = VanillaTree;
             ModSearch.Tree = ModTree;
+            DataSearch.Grid = DataGrid;
 
             InitializeTree(VanillaTree, $"raw_data ({Game.Name})", Game.Data);
             InitializeTree(ModTree, "New Mod*", Game.Mod);
