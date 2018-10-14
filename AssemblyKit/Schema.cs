@@ -24,16 +24,17 @@ namespace AssemblyKit
 
     public class FieldDescr
     {
+        public int Index { get; }
         public string Uuid { get; }
         public string Name { get; }
-        public FieldType Type { get; }
+        public FieldType Type  { get; }
         public bool PrimaryKey { get; }
-        public bool Required { get; }
-        public int MaxLength { get; }
-        public object DefaultValue { get; }
+        public bool Required   { get; }
+        public int  MaxLength  { get; }
+        public object DefaultValue     { get; }
         public string FieldDescription { get; }
-        public bool EncylopediaExport { get; }
-        public bool IsFileName { get; }
+        public bool EncylopediaExport  { get; }
+        public bool IsFileName         { get; }
 
         private static readonly Dictionary<string, string> EmptyDict = new Dictionary<string, string>();
 
@@ -42,8 +43,9 @@ namespace AssemblyKit
 
         public override string ToString() => $"{Name}:{Type}";
 
-        public FieldDescr(XmlNode field)
+        public FieldDescr(int index, XmlNode field)
         {
+            Index = index;
             for (XmlNode e = field.FirstChild; e != null; e = e?.NextSibling)
             {
                 XmlNode valueNode = e.FirstChild;
@@ -151,13 +153,14 @@ namespace AssemblyKit
 
     public class Schema
     {
-        public string Name { get; }
-        public List<FieldDescr> Fields { get; } = new List<FieldDescr>();
-        
-        public Schema(string name, string schemaFile)
+        public readonly string Name;
+        public readonly FieldDescr[] Fields;
+        private readonly Dictionary<string, FieldDescr> Unordered;
+
+        public Schema(string name, string schemaXml)
         {
             Name = name;
-            using (XmlReader reader = XmlReader.Create(schemaFile, new XmlReaderSettings()
+            using (XmlReader reader = XmlReader.Create(schemaXml, new XmlReaderSettings()
             {
                 DtdProcessing = DtdProcessing.Parse,
             }))
@@ -168,12 +171,33 @@ namespace AssemblyKit
                 XmlNode root = doc.LastChild;
                 Debug.Assert(root.Name == "root");
 
+                int index = 0;
                 XmlNode field = root.FirstChild;
+
+                var fields = new List<FieldDescr>();
                 while ((field = field?.NextSibling) != null)
                 {
-                    Fields.Add(new FieldDescr(field));
+                    fields.Add(new FieldDescr(index, field));
+                    ++index;
+                }
+
+                // @note Some performance optimizations here.
+                Fields = fields.ToArray();
+                Unordered = new Dictionary<string, FieldDescr>(Fields.Length);
+
+                for (int i = 0; i < Fields.Length; ++i)
+                {
+                    FieldDescr descr = Fields[i];
+                    Unordered.Add(descr.Name, descr);
                 }
             }
+        }
+
+        public FieldDescr this[string fieldId] => Unordered[fieldId];
+
+        public int IndexOf(string fieldId)
+        {
+            return Unordered[fieldId].Index;
         }
     }
 }

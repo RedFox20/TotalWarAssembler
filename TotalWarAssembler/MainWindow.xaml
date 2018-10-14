@@ -5,8 +5,46 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TotalWarAssembler"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        
-    </Grid>
+        Title="MainWindow" Width="1280" Height="720">
+    <DockPanel>
+        <Menu Height="24" DockPanel.Dock="Top">
+            <MenuItem Header="_File" Width="40">
+                <MenuItem Header="_New Project" />
+                <MenuItem Header="_Open Project (*.twp)" />
+                <MenuItem Header="Open _Mod Pack (*.pack)" />
+                <MenuItem Header="_Close Project"/>
+                <Separator/>
+                <MenuItem Header="_Save "/>
+                <MenuItem Header="Save _As..."/>
+                <Separator/>
+                <MenuItem Header="_Recent Projects" x:Name="RecentProjects"/>
+                <MenuItem Header="_Exit"/>
+            </MenuItem>
+            <MenuItem Header="_Game">
+                <MenuItem Header="_Attila" IsCheckable="true" IsChecked="true"/>
+                <Separator/>
+                <MenuItem Header="_Settings"/>
+            </MenuItem>
+        </Menu>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition MinWidth="100" Width="280" MaxWidth="320"/>
+                <ColumnDefinition MinWidth="100" Width="200" MaxWidth="320"/>
+                <ColumnDefinition MinWidth="400"/>
+            </Grid.ColumnDefinitions>
+            <DockPanel Grid.Column="0" LastChildFill="True">
+                <local:TreeSearchBox x:Name="VanillaSearch" Height="24" TextWrapping="Wrap" DockPanel.Dock="Top" />
+                <TreeView x:Name="VanillaTree" MinHeight="600" ClipToBounds="True"
+                          SelectedItemChanged="VanillaTree_SelectedItemChanged"/>
+            </DockPanel>
+            <GridSplitter Grid.Column="0" Width="4"/>
+            <DockPanel Grid.Column="1" LastChildFill="True">
+                <local:TreeSearchBox x:Name="ModSearch" Height="24" TextWrapping="Wrap" DockPanel.Dock="Top"/>
+                <TreeView x:Name="ModTree" MinHeight="600" ClipToBounds="True" 
+                          SelectedItemChanged="ModTree_SelectedItemChanged"/>
+            </DockPanel>
+            <GridSplitter Grid.Column="1" Width="4" />
+            <local:DataTableGrid Grid.Column="2" x:Name="DataGrid" AutoGenerateColumns="false" />
+        </Grid>
+    </DockPanel>
 </Window>

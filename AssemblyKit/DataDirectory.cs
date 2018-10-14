@@ -13,6 +13,7 @@ namespace AssemblyKit
         public string Name { get; }
         public List<DataDirectory> Subdirs { get; } = new List<DataDirectory>();
         public List<DataTable> Tables { get; } = new List<DataTable>();
+        public bool ReadOnly { get; }
 
         /// <summary>
         /// Relative path, eg: "db"
@@ -21,11 +22,13 @@ namespace AssemblyKit
 
         public override string ToString() => $"dir {RelativePath}";
 
-        public DataDirectory(DataDirectory parent, string name)
+        public DataDirectory(DataDirectory parent, string name, bool readOnly)
         {
             Name = name;
             Parent = parent;
             RelativePath = parent == null ? "" : Path.Combine(parent.RelativePath, Name);
+            parent?.Subdirs.Add(this);
+            ReadOnly = readOnly;
         }
     }
 }

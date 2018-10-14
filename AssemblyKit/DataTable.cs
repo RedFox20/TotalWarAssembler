@@ -8,82 +8,86 @@ using System.Threading.Tasks;
 
 namespace AssemblyKit
 {
-    public class DataColumn
-    {
-        public FieldDescr Id;
-        public object Value;
-
-        public override string ToString() => $"{Id} | {Value}";
-    }
-
     public class DataRow
     {
-        public DataColumn[] Columns { get; }
-        private readonly Dictionary<string, DataColumn> Unordered;
+        public readonly object[] Columns;
 
         public DataRow(Schema schema)
         {
-            int count = schema.Fields.Count;
-            Columns = new DataColumn[count];
-            Unordered = new Dictionary<string, DataColumn>(count);
+            int length = schema.Fields.Length;
+            Columns = new object[length];
 
-            for (int i = 0; i < count; ++i)
+            for (int i = 0; i < length; ++i)
             {
-                FieldDescr descr = schema.Fields[i];
-                var column = new DataColumn
-                {
-                    Id = descr,
-                    Value = descr.DefaultValue
-                };
-                Columns[i] = column;
-                Unordered.Add(descr.Name, column);
+                FieldDescr field = schema.Fields[i];
+                Columns[i] = field.DefaultValue;
             }
         }
 
-        public void Set(string columnId, string value)
+        public void Set(Schema schema, string columnId, string value)
         {
-            DataColumn column = Unordered[columnId];
-            column.Value = column.Id.ParseValue(value);
+            int id = schema.IndexOf(columnId);
+            FieldDescr field = schema.Fields[id];
+            Columns[id] = field.ParseValue(value);
         }
     }
 
-    public partial class DataTable
+    public class DataTable
     {
         public DataDirectory Parent { get; }
         public Schema Schema { get; }
-        public string Name { get; }
-        public string RelativePath { get; }
+        public string Name   { get; }
+        public string RelativePath  { get; }
+        public bool ReadOnly { get; }
 
-        public List<DataRow> Entries { get; private set; }
+        // Load tables lazily, since total amount of Total War data is huge
+        public List<DataRow> Rows
+        {
+            get
+            {
+                if (DataRows == null)
+                {
+                    DataRows = new List<DataRow>();
+                    if (XmlSource != null)
+                        LoadXml(Schema, XmlSource);
+                }
+                return DataRows;
+            }
+        }
+
+        private List<DataRow> DataRows;
+        private readonly string XmlSource;
 
         public override string ToString() => $"table {RelativePath}";
 
-        public DataTable(DataDirectory parent, Schema schema)
+        public DataTable(DataDirectory parent, Schema schema, string xmlFile, bool readOnly)
         {
             Parent = parent;
             Schema = schema;
             Name = schema.Name;
             RelativePath = Path.Combine(parent.RelativePath, Name);
+            XmlSource = xmlFile;
+            ReadOnly = readOnly;
+            parent.Tables.Add(this);
         }
 
-        public void LoadXml(string xmlFile)
+        private void LoadXml(Schema schema, string xmlFile)
         {
-            Entries = new List<DataRow>();
+            // @note This is performance critical,
+            //       so a custom XmlReader is the best option
             using (var parser = new XmlParser(xmlFile))
             {
-                // @note This is performance critical,
-                //       so a custom XmlReader is the best option
                 while (parser.ReadToElement(Name))
                 {
                     var row = new DataRow(Schema);
-                    Entries.Add(row);
+                    Rows.Add(row);
 
                     int depth = parser.Depth;
                     while (parser.ReadToNextElement(depth))
                     {
                         string name = parser.Name;
                         string value = parser.ReadValue(parser.Depth);
-                        row.Set(name, value);
+                        row.Set(schema, name, value);
                     }
                 }
             }

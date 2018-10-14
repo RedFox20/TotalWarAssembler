@@ -11,7 +11,9 @@ namespace AssemblyKitTests
         static void Main(string[] args)
         {
             var game = new AssemblyKit.Game("Attila", @"\Games\steamapps\common\Total War Attila\");
-            game.LoadTables();
+            game.LoadVanillaSchemas();
+
+            Console.ReadKey(true);
         }
     }
 }
