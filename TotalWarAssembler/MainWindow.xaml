@@ -57,6 +57,7 @@
                                      ScrollViewer.CanContentScroll="True"
                                      ItemsSource="{Binding}"
                                      Background="#FFAAAAAA"
+                                     CanUserSortColumns="True"
                                      />
             </DockPanel>
         </Grid>

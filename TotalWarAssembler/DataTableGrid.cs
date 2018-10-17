@@ -27,6 +27,7 @@ namespace TotalWarAssembler
             AutoGenerateColumns = false;
             EnableColumnVirtualization = false;
             EnableRowVirtualization = true;
+            FrozenColumnCount = 1; // freeze first column
         }
 
         public void LoadTable(AssemblyKit.DataTable table)
